@@ -219,28 +219,18 @@ words = [w[1] for w in tuple_alle_ord]
 #print(tuple_unike_ord)
 
 
-#Dette blir en liste med permutasjoner, som det skal, med formatet: [((id1, ord1), (id2, ord2)), ... ]
-edgesList = windowSlider(tuple_alle_ord)
-print(edgesList)
+#Dette blir en liste med permutasjoner/kanter, med kun id
+edgesList = windowSlider(ids)
+#print(edgesList)
+
+edgesDF = spark.createDataFrame(edgesList, ["src", "dst"])
+edgesDF.printSchema()
+edgesDF.show()
 
 #Dataframe containing all the unique words from the post, with id
 verticesDF = spark.createDataFrame(tuple_unike_ord, ['id', 'word'])
 verticesDF.printSchema()
 verticesDF.show()
 
-#####CREATE EDGES AND VERTICES FOR THE GRAPH#####
-##Edges: if two terms are in the same window, they have an edge inbetween them
 
-
-
-# edges = spark.createDataFrame(edgesList, ['Src', 'Dst'])
-# edges.printSchema()
-# edges.show()
-
-##Vertices: Each unique term from the sequence of terms is a node
-#List of distinct words
-
-
-# vertices = spark.createDataFrame(verticesList, ['id'])
-# vertices.printSchema()
-# vertices.show()
+#g = GraphFrame(verticesDF, edgesDF)
