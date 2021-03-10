@@ -71,6 +71,8 @@ def removeShortWords(someList):
             filterLength.append(w)
     return filterLength
 
+
+#Function for finding the permutations in a 5 word "window", used for finding edges
 def windowSlider(someList):
     W = []
     S = []
@@ -213,9 +215,18 @@ tuple_alle_ord = setIDs(tuple_unike_ord, wordList)
 
 ids = [id[0] for id in tuple_alle_ord]
 words = [w[1] for w in tuple_alle_ord]
-print(tuple_alle_ord)
-print(tuple_unike_ord)
+#print(tuple_alle_ord)
+#print(tuple_unike_ord)
 
+
+#Dette blir en liste med permutasjoner, som det skal, med formatet: [((id1, ord1), (id2, ord2)), ... ]
+edgesList = windowSlider(tuple_alle_ord)
+print(edgesList)
+
+#Dataframe containing all the unique words from the post, with id
+verticesDF = spark.createDataFrame(tuple_unike_ord, ['id', 'word'])
+verticesDF.printSchema()
+verticesDF.show()
 
 #####CREATE EDGES AND VERTICES FOR THE GRAPH#####
 ##Edges: if two terms are in the same window, they have an edge inbetween them
