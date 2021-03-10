@@ -30,6 +30,23 @@ def getUniqueWords(tokensList):
             unique.append(item)
     return unique
 
+def findID(tuple_unike_ord, ord):
+    for id, word in tuple_unike_ord:
+        if word == ord:
+            return id
+    return -1
+
+
+def setIDs(tuple_unike_ord, alle_ord):
+    newList = []
+
+    for word in alle_ord:
+        unik_id = findID(tuple_unike_ord, word)
+        tuple = (unik_id, word)
+        newList.append(tuple)
+    return newList
+
+
 def removePuncSym(someString):
     punctuations = '''!()-[]{};:'"\,<>/?@#$%^&*_~'''
     noPuncSym = ""
@@ -67,7 +84,12 @@ def windowSlider(someList):
         W.append(w)
     return S
 
-
+def assignID(someList):
+    newList = []
+    for id, word in enumerate(someList):
+        tuple = (id, word)
+        newList.append(tuple)
+    return newList
 
 stopwordList = ["a","about","above","after","again","against","ain","all","am",
 "an","and","any","are","aren","aren't","as","at","be","because","been","before","being",
@@ -178,32 +200,36 @@ removeStopW = tokenize.map(lambda line : (line[0], removeStopWords(line[1], stop
 clean = removeStopW.map(lambda line : (line[0], removeJunk(line[1])))
 
 #Remove tokens smaller than len(char)=3
-removeShortW = clean.map(lambda line : (line[0], removeShortWords(line[1])))
+removeShortW = clean.map(lambda line : (line[0], removeShortWords(line[1]))) \
+                    .map(lambda line : line[1]).collect()
+
+wordList = removeShortW.pop()
+
+verticesList = getUniqueWords(wordList)
+#eList = windowSlider(wordList)
+
+tuple_unike_ord = assignID(verticesList)
+tuple_alle_ord = setIDs(tuple_unike_ord, wordList)
+
+ids = [id[0] for id in tuple_alle_ord]
+words = [w[1] for w in tuple_alle_ord]
+print(tuple_alle_ord)
+print(tuple_unike_ord)
 
 
 #####CREATE EDGES AND VERTICES FOR THE GRAPH#####
 ##Edges: if two terms are in the same window, they have an edge inbetween them
 
 
-edgesRDD = removeShortW.map(lambda line : windowSlider(line[1])) \
-                .collect()
-edgesList = edgesRDD.pop()
->>>>>>> c709b78e725af53ed8f524b60e0edb88d4774a08
 
-# edgesRDD = removeShortW.map(lambda line : (line[0], windowSlider(line[1]))) \
-#                 .map(lambda x : (x[0], x[1][0][0], x[1][0][1])).take(5)
-
-edges = spark.createDataFrame(edgesList, ['Src', 'Dst'])
-edges.printSchema()
-edges.show()
+# edges = spark.createDataFrame(edgesList, ['Src', 'Dst'])
+# edges.printSchema()
+# edges.show()
 
 ##Vertices: Each unique term from the sequence of terms is a node
 #List of distinct words
 
-verticesRDD = removeShortW.map(lambda line : getUniqueWords(line[1])) \
-                    .zipWithIndex().collect()
-print(verticesRDD)
 
-# vertices = spark.createDataFrame(verticesRDD, ['WordID', 'Words'])
+# vertices = spark.createDataFrame(verticesList, ['id'])
 # vertices.printSchema()
-# vertices.show(5)
+# vertices.show()
