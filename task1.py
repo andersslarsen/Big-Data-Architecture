@@ -14,7 +14,3 @@ sc.setLogLevel('ERROR')
 
 
 INPUT_DATA_PATH = sys.argv[1]
-
-
-
-comments = sc.textFile(INPUT_DATA_PATH + '/comments.csv.gz')
