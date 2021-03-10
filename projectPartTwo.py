@@ -184,23 +184,24 @@ removeShortW = clean.map(lambda line : (line[0], removeShortWords(line[1])))
 #####CREATE EDGES AND VERTICES FOR THE GRAPH#####
 ##Edges: if two terms are in the same window, they have an edge inbetween them
 
-edgesRDD = removeShortW.filter(lambda x : x[0]==INPUT_POST_ID) \
-                .map(lambda line : windowSlider(line[1])) \
-                .take(5)
-print(edgesRDD)
+edgesRDD = removeShortW.map(lambda line : windowSlider(line[1])) \
+                .collect()
+edgesList = edgesRDD.pop()
 
 # edgesRDD = removeShortW.map(lambda line : (line[0], windowSlider(line[1]))) \
 #                 .map(lambda x : (x[0], x[1][0][0], x[1][0][1])).take(5)
 
-# edges = spark.createDataFrame(edgesRDD, ['PostID', 'Src', 'Dst'] )
-# edges.printSchema()
-# edges.show()
+edges = spark.createDataFrame(edgesList, ['Src', 'Dst'])
+edges.printSchema()
+edges.show()
 
 ##Vertices: Each unique term from the sequence of terms is a node
 #List of distinct words
 
-# verticesRDD = removeShortW.map(lambda line : (line[0],getUniqueWords(line[1])))
-#
-# vertices = spark.createDataFrame(verticesRDD, ['PostID', 'Words'])
+verticesRDD = removeShortW.map(lambda line : getUniqueWords(line[1])) \
+                    .zipWithIndex().collect()
+print(verticesRDD)
+
+# vertices = spark.createDataFrame(verticesRDD, ['WordID', 'Words'])
 # vertices.printSchema()
 # vertices.show(5)
