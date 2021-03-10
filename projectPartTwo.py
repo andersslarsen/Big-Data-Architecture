@@ -186,7 +186,7 @@ removeShortW = clean.map(lambda line : (line[0], removeShortWords(line[1])))
 
 edgesRDD = removeShortW.filter(lambda x : x[0]==INPUT_POST_ID) \
                 .map(lambda line : windowSlider(line[1])) \
-                .take(5)
+                .collect()
 print(edgesRDD)
 
 # edgesRDD = removeShortW.map(lambda line : (line[0], windowSlider(line[1]))) \
