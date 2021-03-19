@@ -14,6 +14,7 @@ sc = SparkContext(conf = conf)
 spark = SparkSession(sc)
 sqlContext = SQLContext(sc)
 sc.setLogLevel("ERROR")
+sc.addPyFile("/Users/thomasfosen/Documents/apacheSpark/spark-3.0.1-bin-hadoop3.2/jars/graphframes
 
 INPUT_DATA_PATH = sys.argv[1]
 INPUT_POST_ID = sys.argv[2]
