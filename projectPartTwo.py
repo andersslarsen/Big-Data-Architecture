@@ -14,7 +14,7 @@ sc = SparkContext(conf = conf)
 spark = SparkSession(sc)
 sqlContext = SQLContext(sc)
 sc.setLogLevel("ERROR")
-sc.addPyFile("/Users/thomasfosen/Documents/apacheSpark/spark-3.0.1-bin-hadoop3.2/jars/graphframes
+sc.addPyFile("/Users/thomasfosen/Documents/apacheSpark/spark-3.0.1-bin-hadoop2.7/jars/graphframes-0.8.1-spark3.0-s_2.12.jar")
 
 INPUT_DATA_PATH = sys.argv[1]
 INPUT_POST_ID = sys.argv[2]
@@ -193,17 +193,21 @@ decodeRDD = postRDD.map(lambda x : (x[0], base64.b64decode(x[5]).lower()))
 #Remove all punctuations and symbols, except "DOT"
 remove_punc = decodeRDD.map(lambda line : (line[0], removePuncSym(str(line[1]))))
 
+
+
 #Tokenize text
 tokenize = remove_punc.map(lambda line : (line[0], re.split('\s+', line[1])))
 
-#Remove stopwords
-removeStopW = tokenize.map(lambda line : (line[0], removeStopWords(line[1], stopwordList)))
-
 #Remove "DOT" and other junk
-clean = removeStopW.map(lambda line : (line[0], removeJunk(line[1])))
+clean = tokenize.map(lambda line : (line[0], removeJunk(line[1])))
+
+#Remove stopwords
+removeStopW = clean.map(lambda line : (line[0], removeStopWords(line[1], stopwordList)))
+
+
 
 #Remove tokens smaller than len(char)=3
-removeShortW = clean.map(lambda line : (line[0], removeShortWords(line[1]))) \
+removeShortW = removeStopW.map(lambda line : (line[0], removeShortWords(line[1]))) \
                     .map(lambda line : line[1]).collect()
 
 wordList = removeShortW.pop()
@@ -222,16 +226,25 @@ words = [w[1] for w in tuple_alle_ord]
 
 #Dette blir en liste med permutasjoner/kanter, med kun id
 edgesList = windowSlider(ids)
+eList = getUniqueWords(edgesList)
 #print(edgesList)
 
-edgesDF = spark.createDataFrame(edgesList, ["src", "dst"])
+edgesDF = spark.createDataFrame(eList, ["src", "dst"])
 edgesDF.printSchema()
 edgesDF.show()
 
 #Dataframe containing all the unique words from the post, with id
 verticesDF = spark.createDataFrame(tuple_unike_ord, ['id', 'word'])
-verticesDF.printSchema()
-verticesDF.show()
+#verticesDF.printSchema()
+#verticesDF.show()
+
+g = GraphFrame(verticesDF, edgesDF)
+
+g.degrees.show()
+
+pr = g.pageRank(resetProbability = 0.15, tol = 0.0001)
+pr.vertices.sort("pagerank", ascending=False).select('word', 'pagerank').show(10)
 
 
-#g = GraphFrame(verticesDF, edgesDF)
+
+g = GraphFrame(verticesDF, edgesDF)
