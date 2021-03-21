@@ -195,7 +195,6 @@ decodeRDD = postRDD.map(lambda x : (x[0], base64.b64decode(x[5]).lower()))
 remove_punc = decodeRDD.map(lambda line : (line[0], removePuncSym(str(line[1]))))
 
 
-
 #Tokenize text
 tokenize = remove_punc.map(lambda line : (line[0], re.split('\s+', line[1])))
 
@@ -204,7 +203,6 @@ clean = tokenize.map(lambda line : (line[0], removeJunk(line[1])))
 
 #Remove stopwords
 removeStopW = clean.map(lambda line : (line[0], removeStopWords(line[1], stopwordList)))
-
 
 
 #Remove tokens smaller than len(char)=3
@@ -231,8 +229,8 @@ eList = getUniqueWords(edgesList)
 #print(edgesList)
 
 edgesDF = spark.createDataFrame(eList, ["src", "dst"])
-edgesDF.printSchema()
-edgesDF.show()
+#edgesDF.printSchema()
+#edgesDF.show()
 
 #Dataframe containing all the unique words from the post, with id
 verticesDF = spark.createDataFrame(tuple_unike_ord, ['id', 'word'])
@@ -241,7 +239,7 @@ verticesDF = spark.createDataFrame(tuple_unike_ord, ['id', 'word'])
 
 g = GraphFrame(verticesDF, edgesDF)
 
-g.degrees.show()
+#g.degrees.show()
 
 pr = g.pageRank(resetProbability = 0.15, tol = 0.0001)
 pr.vertices.sort("pagerank", ascending=False).select('word', 'pagerank').show(10)
