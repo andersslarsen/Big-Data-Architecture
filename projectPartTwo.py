@@ -15,7 +15,7 @@ spark = SparkSession(sc)
 sqlContext = SQLContext(sc)
 sc.setLogLevel("ERROR")
 #The following line needs to be altered to the path of the graphframes jar, in the spark config files
-sc.addPyFile("/Users/thomasfosen/Documents/apacheSpark/spark-3.0.1-bin-hadoop2.7/jars/graphframes-0.8.1-spark3.0-s_2.12.jar")
+#sc.addPyFile("/Users/thomasfosen/Documents/apacheSpark/spark-3.0.1-bin-hadoop2.7/jars/graphframes-0.8.1-spark3.0-s_2.12.jar")
 
 INPUT_DATA_PATH = sys.argv[1]
 INPUT_POST_ID = sys.argv[2]
